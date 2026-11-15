@@ -66,10 +66,10 @@ export default function App() {
 
 
       <main ref={scroller} className="flex-1 overflow-y-auto">
-      <section className="relative h-[70dvh] lg:h-[30dvh] lg:min-h-[260px] grid place-items-center text-center text-white"
+      <section className="relative h-[70dvh] lg:h-[60dvh] flex items-end justify-center pb-10 sm:pb-14 text-center text-white"
           style={{ background: COVER ? `center / cover url(${COVER})` : 'linear-gradient(135deg,#1e3a5f,#4a6fa5 55%,#9db7d9)' }}>
           {/* vignette: dark edges + a soft dark centre so the text stays readable on any photo */}
-          <div className="absolute inset-0" style={{ background: 'radial-gradient(ellipse at center, rgba(0,0,0,.42) 0%, rgba(0,0,0,.3) 45%, rgba(0,0,0,.8) 100%)' }} />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to top, rgba(0,0,0,.55), transparent 55%), radial-gradient(ellipse at center, rgba(0,0,0,.42) 0%, rgba(0,0,0,.3) 45%, rgba(0,0,0,.8) 100%)' }} />
           <div className="relative px-4" style={{ textShadow: '0 2px 12px rgba(0,0,0,.6)' }}>
             <h1 className="font-script text-6xl sm:text-8xl leading-tight">{TITLE}</h1>
             <p className="mt-3 text-base sm:text-lg tracking-[0.35em]">{DATE}</p>
