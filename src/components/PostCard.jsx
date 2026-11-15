@@ -1,15 +1,23 @@
 import { useRef, useState } from 'react'
-import { motion } from 'framer-motion'
-import { Heart } from 'lucide-react'
-import { imgUrl, videoUrl, timeAgo, hasLiked, setLiked, sendLike } from '../lib/api'
+import { AnimatePresence, motion } from 'framer-motion'
+import { Heart, Play } from 'lucide-react'
+import Lightbox from './Lightbox'
+import { imgUrl, timeAgo, hasLiked, setLiked, sendLike } from '../lib/api'
+
+const SHOW = 4
+const thumb = (m) => m.localUrl || (m.type === 'video' ? `https://drive.google.com/thumbnail?id=${m.id}&sz=w600` : imgUrl(m.id))
+const LAYOUT = { 1: 'grid-cols-1 grid-rows-1', 2: 'grid-cols-2 grid-rows-1', 3: 'grid-cols-2 grid-rows-2', 4: 'grid-cols-2 grid-rows-2' }
 
 export default function PostCard({ post }) {
   const [liked, setL] = useState(() => hasLiked(post.key))
   const [count, setCount] = useState(post.likes || 0)
   const [pop, setPop] = useState(0)
-  const [idx, setIdx] = useState(0)
+  const [openAt, setOpenAt] = useState(null)
   const lastTap = useRef(0)
-  const n = post.media.length
+  const timer = useRef()
+
+  const shown = post.media.slice(0, SHOW)
+  const extra = post.media.length - SHOW
 
   async function toggle(next) {
     if (next === liked) return
@@ -18,14 +26,20 @@ export default function PostCard({ post }) {
     try { await sendLike(post.key, next ? 1 : -1) } catch { apply(!next) }
   }
 
-  const tap = () => {
+  // single tap opens the viewer, double tap likes
+  const tap = (i) => {
     const now = Date.now()
-    if (now - lastTap.current < 320) { setPop((p) => p + 1); toggle(true) } // double-tap = like
-    lastTap.current = now
+    if (now - lastTap.current < 320) {
+      clearTimeout(timer.current); lastTap.current = 0
+      setPop((p) => p + 1); toggle(true)
+    } else {
+      lastTap.current = now
+      timer.current = setTimeout(() => setOpenAt(i), 320)
+    }
   }
 
   return (
-    <article className="snap-center shrink-0 w-[86vw] max-w-[390px] bg-white border border-neutral-200 rounded-lg overflow-hidden self-start">
+    <article className="w-full max-w-[470px] bg-white border border-neutral-200 rounded-lg overflow-hidden">
       <header className="flex items-center gap-3 px-3 py-2.5">
         <div className="ig-ring p-[2px] rounded-full">
           <div className="w-8 h-8 rounded-full bg-white grid place-items-center text-sm font-semibold border-2 border-white">
@@ -37,18 +51,19 @@ export default function PostCard({ post }) {
       </header>
 
       <div className="relative aspect-[4/5] bg-neutral-100">
-        <div className="flex h-full overflow-x-auto snap-x snap-mandatory no-scrollbar"
-          onScroll={(e) => setIdx(Math.round(e.currentTarget.scrollLeft / e.currentTarget.clientWidth))}>
-          {post.media.map((m) => (
-            <div key={m.id} className="w-full h-full shrink-0 snap-center" onClick={m.type === 'image' ? tap : undefined} style={{ touchAction: 'manipulation' }}>
-              {m.type === 'video'
-                ? <iframe src={videoUrl(m.id)} title={post.guest} allow="autoplay; fullscreen" className="w-full h-full border-0" />
-                : <img src={m.localUrl || imgUrl(m.id)} alt={`Photo by ${post.guest}`} loading="lazy" draggable={false} className="w-full h-full object-cover select-none" />}
-            </div>
+        <div className={`grid gap-0.5 h-full ${LAYOUT[shown.length]}`} style={{ touchAction: 'manipulation' }}>
+          {shown.map((m, i) => (
+            <button key={m.id} onClick={() => tap(i)} aria-label={`Open ${m.type} ${i + 1}`}
+              className={`relative overflow-hidden bg-neutral-200 ${shown.length === 3 && i === 0 ? 'row-span-2' : ''}`}>
+              <img src={thumb(m)} alt="" loading="lazy" draggable={false} className="absolute inset-0 w-full h-full object-cover select-none" />
+              {m.type === 'video' && <Play size={30} className="absolute inset-0 m-auto fill-white text-white drop-shadow" />}
+              {i === SHOW - 1 && extra > 0 && (
+                <span className="absolute inset-0 bg-black/55 text-white text-2xl font-semibold grid place-items-center">+{extra}</span>
+              )}
+            </button>
           ))}
         </div>
 
-        {n > 1 && <span className="absolute top-2 right-2 bg-black/60 text-white text-xs rounded-full px-2 py-0.5">{idx + 1}/{n}</span>}
         {pop > 0 && (
           <motion.div key={pop} className="absolute inset-0 grid place-items-center pointer-events-none"
             initial={{ opacity: 0, scale: 0.4 }} animate={{ opacity: [0, 1, 1, 0], scale: [0.4, 1.2, 1, 1] }} transition={{ duration: 0.8 }}>
@@ -64,6 +79,10 @@ export default function PostCard({ post }) {
         <p className="text-sm font-semibold">{count} {count === 1 ? 'like' : 'likes'}</p>
         {post.caption && <p className="text-sm break-words"><span className="font-semibold">{post.guest}</span> {post.caption}</p>}
       </footer>
+
+      <AnimatePresence>
+        {openAt !== null && <Lightbox media={post.media} start={openAt} guest={post.guest} onClose={() => setOpenAt(null)} />}
+      </AnimatePresence>
     </article>
   )
 }

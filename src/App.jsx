@@ -35,7 +35,7 @@ export default function App() {
   useEffect(() => {
     const el = sentinel.current
     if (!el) return
-    const io = new IntersectionObserver(([e]) => e.isIntersecting && !error && load(), { root: scroller.current, rootMargin: '0px 600px 0px 0px' })
+    const io = new IntersectionObserver(([e]) => e.isIntersecting && !error && load(), { root: scroller.current, rootMargin: '0px 0px 800px 0px' })
     io.observe(el)
     return () => io.disconnect()
   }, [load, error])
@@ -49,7 +49,7 @@ export default function App() {
       const c = [...p]; c[i] = { ...c[i], media: [...c[i].media, ...g.media] }; return c
     })
     setTotal((t) => t + items.length)
-    scroller.current?.scrollTo({ left: 0, behavior: 'smooth' })
+    scroller.current?.scrollTo({ top: 0, behavior: 'smooth' })
     setToast(true); setTimeout(() => setToast(false), 3500)
   }
 
@@ -63,6 +63,8 @@ export default function App() {
         </motion.button>
       </header>
 
+
+      <main ref={scroller} className="flex-1 overflow-y-auto">
       <section className="relative h-32 sm:h-40 shrink-0 grid place-items-center text-center text-white"
         style={{ background: COVER ? `center / cover url(${COVER})` : 'linear-gradient(135deg,#833ab4,#fd1d1d 60%,#fcb045)' }}>
         <div className="absolute inset-0 bg-black/35" />
@@ -71,25 +73,25 @@ export default function App() {
           <p className="text-sm mt-1">{total} {total === 1 ? 'photo or video' : 'photos & videos'} collected</p>
         </div>
       </section>
-
-      <main ref={scroller} className="flex-1 overflow-x-auto overflow-y-hidden snap-x snap-proximity no-scrollbar flex gap-4 items-start px-4 py-5 sm:px-8">
+        <div className="flex flex-col items-center gap-5 px-3 py-5">
         {posts.map((p) => <PostCard key={p.key} post={p} />)}
 
         {next === null && posts.length === 0 && (
-          <div className="m-auto text-center text-neutral-500">
+          <div className="my-12 text-center text-neutral-500">
             <p className="font-semibold text-neutral-800">No posts yet</p>
             <p className="text-sm mt-1">{import.meta.env.VITE_EVENT_SUBTITLE || 'Be the first to share a moment.'}</p>
           </div>
         )}
 
         {loading && [0, 1].map((i) => (
-          <div key={i} className="shrink-0 w-[86vw] max-w-[390px] bg-white border border-neutral-200 rounded-lg animate-pulse">
+          <div key={i} className="w-full max-w-[470px] bg-white border border-neutral-200 rounded-lg animate-pulse">
             <div className="h-14" /><div className="aspect-[4/5] bg-neutral-100" /><div className="h-16" />
           </div>
         ))}
 
         {error && <button onClick={load} className="shrink-0 self-center text-sm text-[#0095f6] font-semibold px-4">{error}. Tap to retry</button>}
-        <div ref={sentinel} className="shrink-0 w-px h-px" />
+        <div ref={sentinel} className="w-full h-px" />
+        </div>
       </main>
 
       <AnimatePresence>
