@@ -1,8 +1,12 @@
 {
-  "name": "guest-gallery",
+  "name": "Cherry and Echo's Wedding Guest Gallery",
   "private": true,
   "type": "module",
-  "scripts": { "dev": "vercel dev", "dev:ui": "vite", "build": "vite build" },
+  "scripts": {
+    "dev": "vercel dev",
+    "dev:ui": "vite",
+    "build": "vite build"
+  },
   "dependencies": {
     "framer-motion": "^11.11.0",
     "lucide-react": "^0.460.0",
