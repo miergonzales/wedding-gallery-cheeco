@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { AnimatePresence, motion } from 'framer-motion'
+import { motion } from 'framer-motion'
 import { Heart, Play } from 'lucide-react'
 import Lightbox from './Lightbox'
 import { imgUrl, timeAgo, hasLiked, setLiked, sendLike } from '../lib/api'
@@ -80,9 +80,7 @@ export default function PostCard({ post }) {
         {post.caption && <p className="text-sm break-words"><span className="font-semibold">{post.guest}</span> {post.caption}</p>}
       </footer>
 
-      <AnimatePresence>
-        {openAt !== null && <Lightbox media={post.media} start={openAt} guest={post.guest} onClose={() => setOpenAt(null)} />}
-      </AnimatePresence>
+      {openAt !== null && <Lightbox media={post.media} start={openAt} guest={post.guest} onClose={() => setOpenAt(null)} />}
     </article>
   )
 }

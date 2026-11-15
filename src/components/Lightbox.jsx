@@ -20,7 +20,7 @@ export default function Lightbox({ media, start, guest, onClose }) {
 
   return createPortal(
     <motion.div className="fixed inset-0 z-[60] bg-black/95 grid place-items-center" onClick={onClose}
-      initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+      initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
       <p className="absolute top-4 left-4 text-white text-sm">Shared by {guest}{n > 1 && `, ${i + 1} of ${n}`}</p>
       <button onClick={onClose} aria-label="Close" className="absolute top-3 right-3 text-white p-2"><X size={26} /></button>
 
