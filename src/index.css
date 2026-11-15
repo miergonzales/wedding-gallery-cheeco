@@ -4,3 +4,4 @@ body { background: #fafafa; color: #262626; font-family: -apple-system, "Segoe U
 .no-scrollbar { scrollbar-width: none; }
 .no-scrollbar::-webkit-scrollbar { display: none; }
 .ig-ring { background: linear-gradient(45deg, #feda75, #fa7e1e, #d62976, #962fbf, #4f5bd5); }
+.font-script { font-family: 'Great Vibes', 'Brush Script MT', cursive; }
